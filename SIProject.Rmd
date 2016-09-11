@@ -1,0 +1,85 @@
+---
+title: "Statistical inference course project"
+author: "Mahesh"
+date: "10 September 2016"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+In this project you will investigate the exponential distribution in R and compare it with the Central Limit Theorem. The exponential distribution can be simulated in R with rexp(n, lambda) where lambda is the rate parameter. The mean of exponential distribution is 1/lambda and the standard deviation is also 1/lambda. Set lambda = 0.2 for all of the simulations. You will investigate the distribution of averages of 40 exponentials. Note that you will need to do a thousand simulations. 
+
+## Simulation (Part 1)
+
+Illustrate via simulation and associated explanatory text the properties of the distribution of the mean of 40 exponentials.
+
+Simulating this with <code>rexp(n, lambda)</code>
+
+```{r}
+# set seed for reproducability
+set.seed(50)
+
+
+nosim <- 1000
+n <- 40
+lambda <- 0.2
+# create a 1000-row matrix in which each row consists of
+# 40 samples drawn from the exp distribution
+simdata <- matrix(rexp(nosim * n, rate = lambda), nosim)
+# take the mean for each row
+row_means <- rowMeans(simdata)
+```
+
+Now compute the Mean and Variance
+<code>th_mean</code> to represent Theoritical Mean
+<code>sa_mean</code> to represent Sample Mean
+<code>th_var</code> to represent Theoritical Variance
+<code>sa_var</code> to represent Sample Variance
+
+```{r}
+th_mean <- 1/lambda
+sa_mean <- mean(row_means)
+th_var <- (1/lambda)^2/n
+sa_var <- var(row_means)
+```
+
+Lets examine the theoritical and sample mean and variance
+
+### Sample Mean versus Theoretical Mean
+
+```{r}
+print(paste("Theoretical mean: ", th_mean));
+print(paste("Sample mean: ", round(sa_mean, 3)))
+```
+
+### Sample Variance versus Theoretical Variance
+
+```{r}
+print (paste("Theoretical variance: ", th_var));
+print(paste("Sample Variance: ", round(sa_var, 3)))
+
+```
+
+### Distribution
+
+```{r}
+# plot the histogram of averages
+hist(row_means, breaks=50, prob=TRUE,
+     main="Distribution of averages of samples,
+     drawn from exponential distribution with lambda=0.2",
+     xlab="")
+# density of the averages of samples
+lines(density(row_means))
+# theoretical center of distribution
+abline(v=1/lambda, col="red")
+# theoretical density of the averages of samples
+xfit <- seq(min(row_means), max(row_means), length=100)
+yfit <- dnorm(xfit, mean=1/lambda, sd=(1/lambda/sqrt(n)))
+lines(xfit, yfit, pch=22, col="red", lty=2)
+# add legend
+legend('topright', c("simulation", "theoretical"), lty=c(1,2), col=c("black", "red"))
+```
